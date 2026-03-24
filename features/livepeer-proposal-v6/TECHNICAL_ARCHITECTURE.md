@@ -1,4 +1,4 @@
-# Livepeer Proposal VF4 Technical Architecture
+# Livepeer Proposal v6 Technical Architecture
 
 This document explains the proposed system in plain language and leaves the treasury mechanics to the separate [wallet governance packet](../livepeer-grant-wallet-governance-v0/2026-03-07-contract-ledgers-packet.md).
 
@@ -10,7 +10,7 @@ Related docs:
 
 ## System Goal
 
-WEAVE is designed to give Livepeer a public path from stakeholder signal to live workload execution. Its system goal is to coordinate the full workload lifecycle: research, engineering, QA, release, maintenance, distribution, and the evidence needed to judge demand.
+WEAVE is an open-source, semi-autonomous agentic orchestration tool designed to give Livepeer a public path from stakeholder signal to live workload execution. Its system goal is to coordinate the full workload lifecycle: research, engineering, QA, release, maintenance, distribution, and the evidence needed to judge demand.
 
 For v1, the first proving lane is embodied avatar workloads. The architecture is still broader than that first lane. Its job is to show how Livepeer can move from intent to released workload through a repeatable public pipeline rather than through fragmented manual handoffs.
 
@@ -23,21 +23,31 @@ Design goals:
 
 ## What WEAVE Coordinates
 
-WEAVE is a decentralized, agent-operated Public Workload Pipeline for Livepeer. It operates outside orchestrator runtimes and coordinates workload creation and improvement across four connected planes:
+WEAVE is an open-source, agent-operated orchestration tool for Livepeer. It operates outside orchestrator runtimes and coordinates workload creation and improvement across four connected planes:
 
-1. **Signal and steering plane**  
+1. **Signal and steering plane**
    Livepeer stakeholders, operators, consumers, and market signals surface opportunities, provide steering, and review outputs.
 
-2. **Lifecycle-agent runtime**  
-   Agents perform bounded work across research, engineering, QA, release preparation, and distribution.
+2. **Lifecycle-agent runtime**
+   Centralized lifecycle agents operated by the Embody team perform bounded work across research, engineering, QA, release preparation, and distribution.
 
-3. **Release and distribution plane**  
+3. **Release and distribution plane**
    Public artifacts, workload registry updates, `SKILL.md` publication, and consumer-facing release surfaces are produced here.
 
-4. **Orchestrator/runtime plane**  
+4. **Orchestrator/runtime plane**
    Orchestrators adopt released workloads and run them on the actual runtime infrastructure.
 
 The key architectural point is that WEAVE coordinates the path into the runtime while the runtime remains the execution plane.
+
+## Dual-Path Architecture
+
+WEAVE serves two distinct creation paths:
+
+1. **Workload creation path** — where workload facilitators build entirely new workloads that run on Livepeer orchestrators. This path covers the full lifecycle from research through engineering, QA, and orchestrator release.
+
+2. **Application creation path** — where app developers build applications on top of existing Livepeer workloads. This path leverages already-released workloads and focuses on consumer-facing integration through public contracts such as `SKILL.md`.
+
+Both paths share the same lifecycle-agent runtime, registry, and human authorization boundary. The economic incentive packets are structured to support both paths independently.
 
 ## Core Actors
 
@@ -45,9 +55,13 @@ The key architectural point is that WEAVE coordinates the path into the runtime 
 
 These actors submit workload intent, propose changes, review outputs, and steer priorities. In some flows, the original proposer remains the primary reviewer. In governance-led flows, review can follow broader network guidance.
 
+### Workload facilitators
+
+These actors engineer and maintain the workloads that orchestrators run. They can be startups building new workloads or established organizations migrating existing services to Livepeer. Facilitators interact with WEAVE through the workload creation path.
+
 ### Lifecycle agents
 
-These agents operate the workload lifecycle across research, engineering, QA, release preparation, and distribution. They can prepare work, publish artifacts, and request review, but they do not self-authorize stage completion.
+These centralized agents, operated by the Embody team, execute the workload lifecycle across research, engineering, QA, release preparation, and distribution. They can prepare work, publish artifacts, and request review, but they do not self-authorize stage completion.
 
 ### Human reviewers / authorizers
 
@@ -59,7 +73,7 @@ These are the infrastructure owners running workloads on Livepeer-compatible har
 
 ### Consumers
 
-These are developers or AI agents using a released workload through a public contract such as `SKILL.md`. They should not need operator-level knowledge or direct host access.
+These are end-users, app developers, or AI agents using a released workload through a public contract such as `SKILL.md`. They should not need operator-level knowledge or direct host access.
 
 ### Treasury / governance roles
 
@@ -86,6 +100,27 @@ What it should not do in v1:
 2. bypass orchestrator control at the runtime boundary
 3. absorb treasury custody or auto-convert logic
 4. claim full autonomy as a prerequisite for delivering value
+
+## Livepeer Component Mapping
+
+WEAVE utilizes existing Livepeer infrastructure rather than replacing it:
+
+| WEAVE function | Livepeer component | Role |
+|---|---|---|
+| Workload deployment | BYOC (Bring Your Own Compute) | Deploys workloads to orchestrator hardware |
+| Workload delivery | Livepeer gateways | Routes consumer requests to orchestrators |
+| Payments | Clearinghouse | Handles workload payment settlement |
+
+Custom Embody components that previously fulfilled these functions will be replaced with their mapped Livepeer-specific components.
+
+## Security Boundary
+
+The security evaluation process sits outside the domain of individual WEAVE users. All workloads are subject to a two-layer security review:
+
+1. **Automatic inspection** — Centralized lifecycle agents operated by the Embody team automatically inspect every workload submitted to the registry.
+2. **Manual review** — Every workload requires a manual review before it is approved for deployment to the registry.
+
+No workload reaches orchestrators without passing both layers. This ensures that individual WEAVE users cannot deploy untested or malicious workloads to the network.
 
 ## Intent To Execution Flow
 
@@ -158,7 +193,7 @@ WEAVE is being proposed on top of public implementation surfaces that already su
 
 Operationally, 13+ orchestrators have registered to the pipeline over time, seven are currently active, prior participants can reenter, and the active lane can already receive autoupdates through the `Unreal_Vtuber` path.
 
-These surfaces show that the proposal starts from a real runtime lane, a real operator lane, and a real distribution surface. VF4 is meant to add demand evidence and a reusable public release path around that base.
+These surfaces show that the proposal starts from a real runtime lane, a real operator lane, and a real distribution surface. v6 is meant to add demand evidence and a reusable public release path around that base.
 
 ## Consumer Distribution Surface
 
@@ -195,16 +230,17 @@ This architecture doc is not the treasury specification. The current treasury fa
 
 1. chain: Arbitrum
 2. treasury custody: proposal-facing multisig on Arbitrum
-3. intended signer composition: one orchestrator tiebreaker signer, two Embody team signers, and two Foundation signers
+3. intended signer composition: one orchestrator tiebreaker signer, two Embody team signers, and two Foundation signers (including the Foundation's head engineer)
 4. treasury actions follow the governed multisig path; if funds are returned, they return to the Livepeer treasury through governed action
 
 Security boundary for the product system:
 
 1. stakeholders and governance provide intent and review
 2. lifecycle agents execute bounded work but do not self-authorize
-3. orchestrator adoption remains operator-controlled at the runtime boundary
-4. consumers interact through public contracts such as `SKILL.md`, not through direct infrastructure access
-5. treasury controls remain separate from runtime and release controls
+3. all workloads are automatically inspected and manually reviewed before registry deployment
+4. orchestrator adoption remains operator-controlled at the runtime boundary
+5. consumers interact through public contracts such as `SKILL.md`, not through direct infrastructure access
+6. treasury controls remain separate from runtime and release controls
 
 ## Observability / Analytics
 

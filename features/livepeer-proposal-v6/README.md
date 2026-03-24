@@ -1,6 +1,8 @@
-# Livepeer Proposal VF4 Public Appendix
+# Livepeer Proposal v6 Public Appendix
 
 This folder contains the public appendix docs behind the proposal narrative.
+
+WEAVE is an open-source, semi-autonomous agentic orchestration tool with a human-in-the-loop design, built to turn intent into researched, engineered, tested, maintained, and distributed workloads on Livepeer.
 
 ## Docs
 
